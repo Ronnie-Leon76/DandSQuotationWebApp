@@ -59,7 +59,7 @@ const fetchQuotations = async (
   });
   const data = await response.json();
   console.log("Data:", data);
-  return data.data;
+  return data.data || [];
 };
 
 export default function QuotationDashboard() {
