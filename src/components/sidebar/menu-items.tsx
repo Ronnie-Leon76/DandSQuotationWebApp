@@ -17,7 +17,7 @@ const MenuItem = ({ size, path, icon, label, current, onSignOut }: Props) => {
         <Link
           onClick={onSignOut}
           className={cn(
-            "flex items-center gap-2 px-1 py-2 rounded-lg my-1",
+            "flex items-center gap-2 px-1 py-2 rounded-lg my-1 focus:outline-none", // Add focus:outline-none
             !current
               ? "text-gray-500"
               : current == path

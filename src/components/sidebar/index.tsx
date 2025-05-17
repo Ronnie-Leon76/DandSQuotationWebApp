@@ -1,25 +1,27 @@
-"use client"
+"use client";
 
-import { cn } from '@/lib/utils';
-import React from 'react'
-import MaxMenu from './maximized-menu';
-import useSideBar from '@/hooks/sidebar/use-sidebar';
-import { MinMenu } from './minimized-menu';
+import { cn } from "@/lib/utils";
+import React from "react";
+import MaxMenu from "./maximized-menu";
+import useSideBar from "@/hooks/sidebar/use-sidebar";
+import { MinMenu } from "./minimized-menu";
 
-type Props = {}
+type Props = {};
 
 const SideBar = (props: Props) => {
   const { expand, onExpand, page, onSignOut } = useSideBar();
+
   return (
     <div
       className={cn(
-        "bg-white dark:bg-neutral-950 h-full w-[60px] fill-mode-forwards fixed md:relative border-r border-gray-200",
-        expand == undefined && "",
-        expand == true
-          ? "animate-open-sidebar"
-          : expand == false && "animate-close-sidebar"
+        "bg-white dark:bg-neutral-950 h-full fixed md:relative border-r border-gray-200 dark:border-neutral-800 z-50 shadow-lg transition-all duration-300",
+        expand === undefined && "",
+        expand === true
+          ? "w-[240px] animate-open-sidebar"
+          : expand === false && "w-[60px] animate-close-sidebar"
       )}
     >
+      {/* Sidebar Content */}
       {expand ? (
         <MaxMenu
           current={page!}
@@ -35,6 +37,6 @@ const SideBar = (props: Props) => {
       )}
     </div>
   );
-}
+};
 
-export default SideBar
+export default SideBar;
