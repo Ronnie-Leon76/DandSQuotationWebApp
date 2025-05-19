@@ -2,185 +2,165 @@
 
 import React, { useState } from "react";
 import { Button } from "../ui/button";
-import { File } from "lucide-react";
-import axios from "axios";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import QuotationForm from "./quotation-form";
-
-import { v4 as uuidv4 } from "uuid";
-import { useRouter } from "next/navigation";
-
-import LoadingDialog from "../loader/loadingSpinner";
+import { Plus, Check } from "lucide-react";
 import { Input } from "../ui/input";
-import toast from "react-hot-toast";
-import RetryDialog from "./retry-form";
 
-export interface ItemData {
-  item_name: string;
-  item_model_name: string;
-  item_quantity: number;
-  running_hours: number;
-}
+type Device = {
+  name: string;
+  hours: string;
+  brand: string;
+  size: string;
+};
 
 const QuotationButton = () => {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState("");
-  const [retryOpen,setRetryOpen] = useState(false);
-  const [retryData,setRetryData] = useState<any>(null);
-  const [items, setItems] = useState<{ id: number; data: ItemData | null }[]>([
-    {
-      id: 1,
-      data: null,
-    },
-  ]);
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [form, setForm] = useState<Device>({
+    name: "",
+    hours: "",
+    brand: "",
+    size: "",
+  });
 
-  const addItem = () => {
-    setItems([
-      ...items,
-      {
-        id: items.length + 1,
-        data: {
-          item_name: "",
-          item_model_name: "",
-          item_quantity: 1,
-          running_hours: 1,
-        },
-      },
-    ]);
-  };
-  const updateItemData = (id: number, data: ItemData) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, data: { ...item.data, ...data } } : item
-      )
-    );
-  };
-  const resetForm = () => {
-    setItems([{ id: 1, data: null }]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleRetry = () => {
-    setRetryOpen(false); 
-    handleSubmit(); 
-  };
-  const handleSubmit = async () => {
-    setLoading(true);
-    const formattedData = items.map((item) => ({
-      item_name: item.data?.item_name,
-      item_model_name: item.data?.item_model_name,
-      item_quantity: item.data?.item_quantity,
-      running_hours: item.data?.running_hours,
-      location: location,
-    }));
-
-    // resetForm();
-    setOpen(false);
-    const uniqueId = uuidv4();
-    const apiEndpoint = process.env.NEXT_PUBLIC_AI_QUOTATION_ENDPOINT;
-    if (!apiEndpoint) {
-      throw new Error(
-        "API endpoint is not defined in the environment variables."
-      );
+  const addDevice = () => {
+    if (form.name && form.hours && form.brand && form.size) {
+      setDevices([...devices, form]);
+      setForm({ name: "", hours: "", brand: "", size: "" });
     }
-    try {
-      sessionStorage.setItem("quoteData", JSON.stringify(null));
-      const response = await axios.post(apiEndpoint as string, formattedData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  };
 
-      if (response.status === 200) {
-        setLoading(false);
-        console.log("Response Data:", response.data);
-        const quoteData = response.data;
-        sessionStorage.setItem("quoteData", JSON.stringify(quoteData));
-        router.push(`/quotation/${uniqueId}`);
-      } else {
-        console.log("I am Here in the Error")
-        setLoading(false);
-        setRetryData(formattedData);
-        setRetryOpen(true);
-        // toast.error(`Server Error: Please try again.${response.status}`);
-        // console.error(`Unexpected status code: ${response.status}`);
-      }
-    } catch (error) {
-      toast.error(`Unable to Send Request: Please try again. ${error}`);
-      setLoading(false);
-      setRetryData(formattedData);
-      setRetryOpen(true);
-      console.error("Error occurred:", error);
-    }
+  const removeDevice = (idx: number) => {
+    setDevices(devices.filter((_, i) => i !== idx));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Submit logic here
   };
 
   return (
-    <div className="w-full">
-      <LoadingDialog open={loading} />
-      <RetryDialog
-        open={retryOpen}
-        formattedData={retryData}
-        onRetry={handleRetry}
-        onCancel={() => setRetryOpen(false)}
-      />
-      <Dialog open={open} onOpenChange={setOpen} modal>
-        <DialogTrigger asChild>
-          <Button className="" size ="lg">
-            <File />
-            Request a Quotation <span className="ml-2"></span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[800px] sm:min-w-[600px] sm:min-h-[400px]">
-          <DialogHeader className="mb-1">
-            <DialogTitle>Quotation Information</DialogTitle>
-            <DialogDescription>
-              Make changes to your quotation request. Click save when
-              you&apos;re done.
-            </DialogDescription>
-            <Accordion type="single" collapsible className="w-full">
-              {items.map((item) => (
-                <AccordionItem key={item.id} value={`item-${item.id}`}>
-                  <AccordionTrigger>{`Item ${item.id}`}</AccordionTrigger>
-                  <AccordionContent>
-                    <QuotationForm
-                      id={item.id}
-                      onChange={(data) => updateItemData(item.id, data)}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+    <div className="max-w-3xl mx-auto mt-10 bg-white rounded-xl shadow-lg p-8">
+      {/* Step Indicator and Title */}
+      <div className="flex items-center mb-6">
+        <span className="bg-blue-600 text-white rounded-full px-3 py-1 mr-3 font-bold">
+          01
+        </span>
+        <h2 className="text-blue-700 font-semibold text-lg">
+          Which Devices do you have ?
+        </h2>
+      </div>
+      {/* Inline Form */}
+      <form onSubmit={handleSubmit}>
+        <div className="flex gap-4 mb-2">
+          <div className="flex flex-col flex-1">
+            <label className="text-xs font-semibold text-blue-700 mb-1">
+              Device
+            </label>
             <Input
-              className="w-full"
-              placeholder="Enter Quotation Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              className="border rounded px-3 py-2"
+              placeholder="Enter Device Name"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
             />
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={addItem}>
-              Add Item
-            </Button>
-            <Button onClick={handleSubmit}>Submit</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+          <div className="flex flex-col flex-1">
+            <label className="text-xs font-semibold text-blue-700 mb-1">
+              Hours Used
+            </label>
+            <Input
+              className="border rounded px-3 py-2"
+              placeholder="Enter Hours Used"
+              name="hours"
+              value={form.hours}
+              onChange={handleChange}
+              type="number"
+            />
+          </div>
+          <div className="flex flex-col flex-1">
+            <label className="text-xs font-semibold text-blue-700 mb-1">
+              Brand
+            </label>
+            <Input
+              className="border rounded px-3 py-2"
+              placeholder="Enter Brand Name"
+              name="brand"
+              value={form.brand}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex flex-col flex-1">
+            <label className="text-xs font-semibold text-blue-700 mb-1">
+              Size
+            </label>
+            <Input
+              className="border rounded px-3 py-2"
+              placeholder="Enter Size"
+              name="size"
+              value={form.size}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="flex gap-4 mb-6">
+          <Button
+            type="button"
+            onClick={addDevice}
+            className="flex items-center bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
+          >
+            <Plus className="mr-2" size={18} /> Add Device
+          </Button>
+          <Button
+            type="submit"
+            className="flex items-center bg-black text-white px-4 py-2 rounded font-semibold hover:bg-gray-800 transition"
+          >
+            <Check className="mr-2" size={18} /> Submit Form
+          </Button>
+        </div>
+      </form>
+      {/* Devices Table */}
+      <div>
+        <h3 className="font-semibold mb-2 text-sm text-blue-700">My Devices</h3>
+        <table className="w-full text-left border-t">
+          <thead>
+            <tr className="text-gray-500 text-xs">
+              <th className="py-2">DEVICE NAME</th>
+              <th>HOURS USED</th>
+              <th>BRAND</th>
+              <th>SIZE</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {devices.map((d, idx) => (
+              <tr key={idx} className="border-t">
+                <td className="py-2">{d.name}</td>
+                <td>{d.hours}</td>
+                <td>{d.brand}</td>
+                <td>{d.size}</td>
+                <td>
+                  <button
+                    className="text-red-500 hover:underline text-xs"
+                    onClick={() => removeDevice(idx)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {devices.length === 0 && (
+              <tr>
+                <td colSpan={5} className="text-gray-400 py-4 text-center text-xs">
+                  No devices added yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

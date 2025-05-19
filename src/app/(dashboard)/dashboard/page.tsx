@@ -294,7 +294,12 @@ export default function QuotationDashboard() {
       {/* Location Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Set Your Location</CardTitle>
+          <div className="flex items-center">
+            <span className="bg-[#2563eb] text-white rounded-full px-3 py-1 mr-3 font-bold">02</span>
+            <CardTitle className="text-[#2563eb] font-semibold text-lg">
+              Set Your Location ?
+            </CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
