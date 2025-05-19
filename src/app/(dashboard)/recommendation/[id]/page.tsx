@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 interface OptionProps {
   name: string;
@@ -47,7 +48,6 @@ interface OptionStatus {
   status: "loading" | "success" | "error";
 }
 
-
 async function fetchQuotation(quotationId: string) {
   try {
     const res = await fetch("/api/quotationId", {
@@ -68,7 +68,6 @@ async function fetchQuotation(quotationId: string) {
   }
 }
 
-
 async function fetchSolarAnalysis(optionName: string, grandTotal: number) {
   const res = await fetch(`/api/solar-analysis`, {
     method: "POST",
@@ -78,13 +77,35 @@ async function fetchSolarAnalysis(optionName: string, grandTotal: number) {
   return await res.json();
 }
 
+// Example product recommendations (replace with real data)
+const recommendations = [
+  {
+    name: "Solar Home Kit 500W",
+    price: "KES 25,000",
+    image: "/images/solar-kit.jpg",
+    link: "https://shop.example.com/solar-kit-500w",
+  },
+  {
+    name: "Inverter 1kVA",
+    price: "KES 15,000",
+    image: "/images/inverter.jpg",
+    link: "https://shop.example.com/inverter-1kva",
+  },
+  {
+    name: "Deep Cycle Battery 200Ah",
+    price: "KES 18,000",
+    image: "/images/battery.jpg",
+    link: "https://shop.example.com/battery-200ah",
+  },
+];
+
 export default function SolarQuotationVisualizer() {
   const router = useRouter();
   const { id: quotationId } = useParams<{ id: string }>();
   const [quotation, setQuotation] = useState<Quotation | null>(null);
   const [analysisData, setAnalysisData] = useState<AnalysisData[]>([]);
   const [optionStatuses, setOptionStatuses] = useState<OptionStatus[]>([]);
-  const [loadingComplete, setLoadingComplete] = useState(false); 
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
     if (!quotationId) return;
@@ -93,7 +114,6 @@ export default function SolarQuotationVisualizer() {
       const fetchedQuotation = await fetchQuotation(quotationId);
       if (fetchedQuotation) {
         setQuotation(fetchedQuotation);
-
 
         const initialStatuses = fetchedQuotation.options.map((option: OptionProps) => ({
           name: option.name,
@@ -112,8 +132,8 @@ export default function SolarQuotationVisualizer() {
               {
                 name: option.name,
                 grandTotal: option.grand_total,
-                efficiency: analysis.data.efficiency.toString(), 
-                lifespan: parseFloat(analysis.data.lifespan), 
+                efficiency: analysis.data.efficiency.toString(),
+                lifespan: parseFloat(analysis.data.lifespan),
                 recommendation: analysis.data.recommendation,
               },
             ]);
@@ -144,7 +164,7 @@ export default function SolarQuotationVisualizer() {
 
   useEffect(() => {
     if (loadingComplete) {
-      router.refresh(); 
+      router.refresh();
     }
   }, [loadingComplete, router]);
 
@@ -233,6 +253,41 @@ export default function SolarQuotationVisualizer() {
           </div>
         );
       })}
+
+      {/* Product Recommendations Section */}
+      <div className="mt-12">
+        <h2 className="text-xl font-bold mb-6">Recommended Products for You</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {recommendations.map((item, idx) => (
+            <Card
+              key={idx}
+              className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition p-6 flex flex-col items-center"
+            >
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-40 h-40 object-contain mb-4 rounded"
+              />
+              <CardHeader className="p-0 mb-2">
+                <CardTitle className="text-lg font-semibold text-gray-800 text-center">
+                  {item.name}
+                </CardTitle>
+              </CardHeader>
+              <div className="text-blue-600 font-bold text-xl mb-4">{item.price}</div>
+              <CardContent className="p-0 w-full">
+                <Button
+                  asChild
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded"
+                >
+                  <a href={item.link} target="_blank" rel="noopener noreferrer">
+                    View in Shop
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
