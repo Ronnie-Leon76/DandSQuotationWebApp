@@ -285,17 +285,13 @@ export default function QuotationDashboard() {
         </Card>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <QuotationButton />
-        <ExcelPage />
-      </div>
+     
 
       {/* Location Section */}
       <Card>
         <CardHeader>
           <div className="flex items-center">
-            <span className="bg-[#2563eb] text-white rounded-full px-3 py-1 mr-3 font-bold">02</span>
+            <span className="bg-[#2563eb] text-white rounded-full px-3 py-1 mr-3 font-bold">01</span>
             <CardTitle className="text-[#2563eb] font-semibold text-lg">
               Set Your Location ?
             </CardTitle>
@@ -335,6 +331,12 @@ export default function QuotationDashboard() {
           </div>
         </CardContent>
       </Card>
+
+       {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <QuotationButton />
+        <ExcelPage />
+      </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

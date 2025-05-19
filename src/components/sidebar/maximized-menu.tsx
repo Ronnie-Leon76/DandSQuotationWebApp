@@ -13,7 +13,7 @@ type Props = {
 
 const MaxMenu = ({ current, onExpand, onSignOut }: Props) => {
   return (
-    <div className="py-4 px-2 flex flex-col h-full bg-gradient-to-b from-[#0091EE] to-[#005fa3] rounded-r-2xl shadow-xl transition-all duration-300">
+    <div className="py-4 px-2 flex flex-col h-[calc(100vh-32px)] bg-gradient-to-b from-[#0091EE] to-[#005fa3] rounded-r-2xl shadow-xl transition-all duration-300">
       {/* Logo Section */}
       <div className="flex justify-between items-center mb-6 px-2">
         <div className="bg-white rounded-lg p-2 shadow transition-transform duration-200 hover:scale-105">
@@ -33,7 +33,7 @@ const MaxMenu = ({ current, onExpand, onSignOut }: Props) => {
         </div>
       </div>
       {/* Menu Section */}
-      <div className="flex flex-col justify-between h-full">
+      <div className="flex flex-col justify-between flex-1 h-full">
         <div>
           <p className="text-lg text-white mb-4 px-4 font-bold tracking-wide">MENU</p>
           <nav className="flex flex-col gap-1">
